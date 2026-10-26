@@ -28,8 +28,16 @@ scorers = [fuzz.ratio, fuzz.partial_ratio, fuzz.token_sort_ratio, fuzz.token_set
 
 for scorer in scorers:
     print("==", scorer.__name__)
+    results = []
     for i, row in tests.iterrows():
         match, score, idx = process.extractOne(row["clean"], choices, scorer=scorer)
         predicted = recognized["entity_id"][idx]
         correct = predicted == row["true_name"]
         print(row["raw_name"], "|", match, "|", round(score), "|", predicted, "|", correct)
+        results.append((score, correct))
+    for threshold in [70, 80, 90]:
+        accepted = [c for s, c in results if s >= threshold]
+        precision = sum(accepted) / len(accepted)
+        recall = sum(accepted) / len(results)
+        print(f"threshold {threshold}: accepted {len(accepted)}, precision {precision:.2f}, recall {recall:.2f}")
+    print()
