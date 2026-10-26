@@ -1,6 +1,7 @@
 import pandas as pd
 import unicodedata
 import re
+from rapidfuzz import process, fuzz
 
 tests = pd.read_csv("data/test_names.csv")
 recognized = pd.read_csv("data/recognized_names.csv")
@@ -19,5 +20,16 @@ def normalize(name):
     joined_together = " ".join(words_kept)
     return joined_together
 
-print(normalize("Bell Textron Canada Ltée"))
-print(normalize("I.B.M."))
+tests["clean"] = tests["raw_name"].apply(normalize)
+recognized["clean"] = recognized["recognized_name"].apply(normalize)
+
+choices = recognized["clean"].tolist()
+scorers = [fuzz.ratio, fuzz.partial_ratio, fuzz.token_sort_ratio, fuzz.token_set_ratio]
+
+for scorer in scorers:
+    print("==", scorer.__name__)
+    for i, row in tests.iterrows():
+        match, score, idx = process.extractOne(row["clean"], choices, scorer=scorer)
+        predicted = recognized["entity_id"][idx]
+        correct = predicted == row["true_name"]
+        print(row["raw_name"], "|", match, "|", round(score), "|", predicted, "|", correct)
