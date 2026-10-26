@@ -1,0 +1,42 @@
+Entity matching prototype — observations
+
+Setup
+- Test set: 20 messy company names covering 7 case types (suffixes,
+  typos, reordered words, abbreviations, extra words, French names,
+  and decoys that look like a different company).
+- Matched against 10 recognized companies using rapidfuzz's
+  process.extractOne, after normalizing both sides (lowercase, remove
+  accents and punctuation, "&" -> "and", strip legal suffixes).
+
+Results (correct out of 20)
+- ratio: 15        partial_ratio: 18
+- token_sort_ratio: 15   token_set_ratio: 18
+- Best precision/recall: partial_ratio at threshold 90
+  (precision 1.00, recall 0.80).
+
+What I noticed
+1. Shared filler words cause wrong matches. With plain ratio,
+   "IBM Canada Ltd." matched Bell Canada because "canada" is longer
+   than "ibm" and dominates the score.
+2. Each scorer fixes some cases and breaks others. token_sort fixed
+   reordered names ("Hydro Toronto") but broke "Hydro One Networks."
+3. token_set's worst error can't be fixed with a threshold.
+   "Bell Textron Canada" matched Bell Canada with a score of 100,
+   because every word of "bell canada" is in it. Its precision stays
+   at 0.94 at every threshold.
+4. partial_ratio scored best here, but short names like "cgi" or
+   "bell" can fit inside unrelated longer names, so I'd expect more
+   false matches on a real list of thousands of suppliers.
+5. My normalization turned "I.B.M." into "i b m". It still matched
+   IBM, but with low scores (50-75), so a strict threshold sends it
+   to review.
+6. "International Business Machines" failed with every scorer.
+   String similarity can't connect a full name to its abbreviation.
+
+What I'd try next
+- An alias table for known abbreviations (IBM, CGI).
+- Merging single letters after normalization ("i b m" -> "ibm").
+- Flagging matches where the input has extra distinguishing words
+  (like "textron") for human review instead of auto-accepting.
+- For government data: a false merge is worse than a missed match,
+  so I'd favor precision and send uncertain cases to review.
