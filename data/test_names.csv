@@ -1,0 +1,21 @@
+raw_name,true_name,case_type
+IBM Canada Ltd.,ibm,suffix
+IBM CANADA LIMITED,ibm,suffix
+I.B.M.,ibm,abbreviation
+International Business Machines,ibm,abbreviation
+Deloitte LLP,deloitte,suffix
+Deloite Inc.,deloitte,typo
+Deloitte & Touche LLP,deloitte,extra_words
+Hydro Toronto,toronto_hydro,reordered
+Toronto Hydro-Electric System Limited,toronto_hydro,extra_words
+Toronto Hyrdo,toronto_hydro,typo
+Bell Canada Inc.,bell_canada,suffix
+Rogers Communications Inc.,rogers_comms,suffix
+Rogers Comm.,rogers_comms,abbreviation
+Communications Rogers inc.,rogers_comms,french
+CGI Inc.,cgi,suffix
+Conseillers en gestion et informatique CGI inc.,cgi,french
+Rogers Sugar Inc.,rogers_sugar,decoy
+Bell Textron Canada Ltée,bell_textron,decoy
+Hydro One Networks Inc.,hydro_one,decoy
+Hydro-Québec,hydro_quebec,decoy
